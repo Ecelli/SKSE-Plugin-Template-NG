@@ -26,7 +26,7 @@ namespace Settings
 			is_bool<T> || is_text<T> || is_numerical<T>;
 
 		class Holder :
-			public REX::TSingleton<Holder>
+			public REX::Singleton<Holder>
 		{
 		public:
 			void ReadSettings();

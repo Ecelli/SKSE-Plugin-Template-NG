@@ -4,21 +4,28 @@
 #include "SKSE/SKSE.h"
 #include "REX/REX.h"
 
-#include <expected>>
+#define W32_LEAN_AND_MEAN
+#define NOMINMAX
+#include <Windows.h>
+#include <ClibUtil/utils.hpp>
+
+#include <expected>
 #include <unordered_set>
+#include <unordered_map>
 #include <fstream>
 #include <spdlog/sinks/basic_file_sink.h>
 #include <json/json.h>
 
 #include "Plugin.h"
 
-#define DLLEXPORT __declspec(dllexport)
-
 #ifndef NDEBUG
 #define LOG_DEBUG(msg, ...) logger::debug(msg, ##__VA_ARGS__)
 #else
 #define LOG_DEBUG(msg, ...)
 #endif
+
+namespace logger = SKSE::log;
+using SKSE::stl::report_and_fail;
 
 using namespace std::literals;
 namespace util
@@ -84,12 +91,4 @@ namespace stl {
 template <class T>
 inline constexpr bool always_false = false;
 
-#define SECTION_SEPARATOR REX::INFO("=========================================================="sv)
-
-#ifdef SKYRIM_AE
-#	define OFFSET(se, ae) ae
-#	define OFFSET_3(se, ae, vr) ae
-#else
-#	define OFFSET(se, ae) se
-#	define OFFSET_3(se, ae, vr) se
-#endif
+#define SECTION_SEPARATOR logger::info("=========================================================="sv)

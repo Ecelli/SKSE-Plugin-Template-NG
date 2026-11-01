@@ -226,11 +226,13 @@ namespace FormUtils
         }
 
         bool modIspreceding = true;
-        const std::string_view preceding = str.substr(0, delimiterPos);
-        const std::string_view following = str.substr(delimiterPos + 1);
+        const std::string_view view{ str };
+        const auto delimiterIndex = static_cast<std::size_t>(std::distance(str.begin(), delimiterPos));
+        const std::string_view preceding = view.substr(0, delimiterIndex);
+        const std::string_view following = view.substr(delimiterIndex + 1);
 
         auto rawID = to_num<RE::FormID>(following);
-        if (raw_id.error()) {
+        if (rawID.error()) {
             rawID = to_num<RE::FormID>(preceding);
             if (rawID.error()) {
                 return std::unexpected(QueryError::InvalidFormID);

@@ -1,14 +1,20 @@
 {
   "name": "template-plugin",
   "version-string": "1.0.0",
-  "description": "Template for SKSE plugin built using commonlib. GPL License by default.",
-  "homepage": "https://github.com/SeaSparrowOG/SKSE-Plugin-Template",
+  "description": "Template for an SKSE plugin built with CommonLibSSE-NG.",
+  "homepage": "https://github.com/Ecelli/SKSE-Plugin-Template-NG",
   "license": "GPL-3.0-or-later",
   "dependencies": [
-    "commonlib-shared",
     "clib-util",
+    "directxmath",
+    "directxtk",
+    "fmt",
+    "imgui",
     "jsoncpp",
+    "spdlog",
+    "simpleini",
+    "rapidcsv",
     "xbyak"
   ],
-  "builtin-baseline": "eae1680538b86f962455c27abca2aad0dc304a4d"
+  "builtin-baseline": "ee12231b20c95013c6638d845d04c91559a1d1ff"
 }

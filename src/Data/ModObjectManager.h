@@ -5,7 +5,7 @@ namespace Data
 	bool PreloadModObjects();
 
 	class ModObjectManager :
-		public REX::TSingleton<ModObjectManager>
+		public REX::Singleton<ModObjectManager>
 	{
 	public:
 		const std::string QuestName = fmt::format("{}_ModObjectsQuest", Plugin::NAME);

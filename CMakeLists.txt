@@ -21,49 +21,46 @@ get_filename_component(
 
 list(APPEND CMAKE_IGNORE_PATH "${PROJECT_BINARY_DIR}")
 list(APPEND CMAKE_MODULE_PATH
-	"${PROJECT_SOURCE_DIR}/tools/SKSE-CMakeModules/Modules"
+	"${PROJECT_SOURCE_DIR}/Tools/SKSE-CMakeModules/Modules"
 )
 list(APPEND CMAKE_MODULE_PATH
-	"${PROJECT_SOURCE_DIR}/tools/Bethesda-CMakeModules/Modules"
+	"${PROJECT_SOURCE_DIR}/Tools/Bethesda-CMakeModules/Modules"
 )
 
 include(SKSEPlugin)
 set(SKSE_USE_XBYAK ON)
 find_path(CLIB_UTIL_INCLUDE_DIRS "ClibUtil/utils.hpp")
 
-add_compile_definitions(SKSE_SUPPORT_XBYAK)
-add_compile_definitions(SKYRIM_AE)
-add_compile_definitions(SKYRIM_SUPPORT_AE)
-
-set(SKSE_COMMONLIBSSE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/External/CommonLibSSE")
-set(SKSE_NO_INSTALL ON)
-
-if (GOG)
-	add_compile_definitions(SKYRIM_GOG)
-	set(SKSE_COMMONLIBSSE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/External/CommonLibSSE_1.6")
-endif()
+set(SKSE_COMMONLIBSSE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/External/CommonLibSSE-NG")
+set(BUILD_TESTS OFF CACHE BOOL "" FORCE)
+set(ENABLE_SKYRIM_SE ON CACHE BOOL "" FORCE)
+set(ENABLE_SKYRIM_AE ON CACHE BOOL "" FORCE)
+set(ENABLE_SKYRIM_VR OFF CACHE BOOL "" FORCE)
 
 SKSEPlugin_Add(
 	${PROJECT_NAME}
 	SOURCE_DIR src
-	INCLUDE_DIR include
 	SOURCES
 		README.md
 		vcpkg.json
 	PRECOMPILE_HEADERS
-		src/common/PCH.h
+		src/Common/PCH.h
 )
 
 find_package(jsoncpp CONFIG REQUIRED)
+find_package(imgui CONFIG REQUIRED)
 
 target_link_libraries(
 		"${PROJECT_NAME}"
 		PRIVATE
 			JsonCpp::JsonCpp
+			imgui::imgui
 )
 
-set_target_properties(CommonLibSSE PROPERTIES
-	FOLDER External
+target_compile_definitions(
+		"${PROJECT_NAME}"
+		PRIVATE
+			NOMINMAX
 )
 
 target_include_directories(
@@ -102,15 +99,13 @@ if (MSVC)
 	)
 endif ()
 
-set(DATA_DIR "${PROJECT_SOURCE_DIR}/data")
+set(DATA_DIR "${PROJECT_SOURCE_DIR}/Data")
 
 include(components.cmake)
 
 # ---- Post build ----
 if(DEFINED ENV{SKYRIM_MODS_FOLDER} AND IS_DIRECTORY "$ENV{SKYRIM_MODS_FOLDER}")
-	if(GOG)
-		set(OUTPUT_FOLDER "$ENV{SKYRIM_MODS_FOLDER}/${PROJECT_NAME} - GOG")
-	elseif (FULL_RELEASE)
+	if (FULL_RELEASE)
 		set(OUTPUT_FOLDER "$ENV{SKYRIM_MODS_FOLDER}/${PROJECT_NAME} - Full Release")
 	else()
 		set(OUTPUT_FOLDER "$ENV{SKYRIM_MODS_FOLDER}/${PROJECT_NAME} - Test")
@@ -165,7 +160,7 @@ if(DEFINED OUTPUT_FOLDER AND NOT SKIP_ARTIFACTS)
 			-DSRC_DIR="${PROJECT_SOURCE_DIR}/Data"
 			-DDST_DIR="${OUTPUT_FOLDER}"
 			-DPROJECT_NAME="${PROJECT_NAME}"
-			-P "${PROJECT_SOURCE_DIR}/CMake/Scripts/CMake-Copy-Artifacts.cmake"
+			-P "${PROJECT_SOURCE_DIR}/cmake/Scripts/CMake-Copy-Artifacts.cmake"
     )
 
     if(COPY_BSA)
@@ -177,7 +172,7 @@ if(DEFINED OUTPUT_FOLDER AND NOT SKIP_ARTIFACTS)
 				-DDST_DIR=${OUTPUT_FOLDER}
 				-DPROJECT_NAME=${PROJECT_NAME}
 				-DBINARY_DIR=${CMAKE_BINARY_DIR}
-				-P "${PROJECT_SOURCE_DIR}/CMake/Scripts/CMake-Copy-Archive.cmake"
+				-P "${PROJECT_SOURCE_DIR}/cmake/Scripts/CMake-Copy-Archive.cmake"
 			VERBATIM
 		)
 	endif()
@@ -189,7 +184,7 @@ if(DEFINED OUTPUT_FOLDER AND NOT SKIP_ARTIFACTS)
         COMMAND "${CMAKE_COMMAND}"
             -DCOMPILED_SCRIPTS="${CMAKE_BINARY_DIR}/Scripts"
             -DOUTPUT_FOLDER="${OUTPUT_FOLDER}"
-            -P "${PROJECT_SOURCE_DIR}/CMake/Scripts/CMake-Copy-Scripts.cmake"
+            -P "${PROJECT_SOURCE_DIR}/cmake/Scripts/CMake-Copy-Scripts.cmake"
         VERBATIM
 		)
     endif()
@@ -201,7 +196,7 @@ if(DEFINED OUTPUT_FOLDER AND NOT SKIP_ARTIFACTS)
         COMMAND "${CMAKE_COMMAND}"
             -DSOURCE_SCRIPTS="${PROJECT_SOURCE_DIR}/Data/Source/Scripts"
             -DOUTPUT_FOLDER="${OUTPUT_FOLDER}"
-            -P "${PROJECT_SOURCE_DIR}/CMake/Scripts/CMake-Copy-Sources.cmake"
+            -P "${PROJECT_SOURCE_DIR}/cmake/Scripts/CMake-Copy-Sources.cmake"
         VERBATIM
 		)
     endif()
@@ -219,8 +214,9 @@ install(
 
 install(
   FILES 
-	"${DATA_DIR}/${PROJECT_NAME}.bsa"
+	"${CMAKE_BINARY_DIR}/${PROJECT_NAME}.bsa"
 	"${DATA_DIR}/${PROJECT_NAME}.esp"
   DESTINATION "."
   COMPONENT components 
+  OPTIONAL
 )
