@@ -7,10 +7,10 @@
 ---
 ### Instructions:
 ```
-git clone https://github.com/SeaSparrowOG/SKSE-Plugin-Template
+git clone https://github.com/Ecelli/SKSE-Plugin-Template-NG
 cd SKSE-Plugin-Template
 git submodule update --init --recursive
-cmake --preset vs2022-windows-vcpkg-release
+cmake --preset vs2022-windows-vcpkg-github
 cmake --build --preset Release
 ```
 ---
